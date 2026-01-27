@@ -1,3 +1,5 @@
+import numpy as np
+
 class LinearRegression:
     def __init__(self, batch_size=32, regularization=0, max_epochs=100, patience=3):
         """Linear Regression using Gradient Descent.
@@ -21,7 +23,8 @@ class LinearRegression:
         self.weights = None
         self.bias = None
 
-    def fit(self, X, y, batch_size=32, regularization=0, max_epochs=100, patience=3):
+    def fit(self, X, y, batch_size=32, regularization=0, max_epochs=100, patience=3, 
+            learning_rate = 0.01):
         """Fit a linear model.
 
         Parameters:
@@ -35,15 +38,21 @@ class LinearRegression:
         patience: int
             The number of epochs to wait before stopping if the validation loss
             does not improve.
+        learning_rate: float
+            the step size for gradient descent
         """
         self.batch_size = batch_size
         self.regularization = regularization
         self.max_epochs = max_epochs
         self.patience = patience
+        self.learning_rate = learning_rate
 
         # TODO: Initialize the weights and bias based on the shape of X and y.
-        self.weights = None
-        self.bias = None
+        n_samples, n_features = X.shape
+        n_outputs = y.shape[1] if y.ndim > 1 else 1
+
+        self.weights = np.random.randn(n_features, n_outputs) * 0.01
+        self.bias = np.zeros((1,n_outputs))
 
         # TODO: Implement the training loop.
 
