@@ -147,3 +147,8 @@ class LinearRegression:
     
     def save(self, file_path):
         np.savez(file_path, weights = self.weights, bias = self.bias)
+    
+    def load(self, file_path):
+        data = np.load(file_path)
+        self.weights = data['weights']
+        self.bias = data['bias']

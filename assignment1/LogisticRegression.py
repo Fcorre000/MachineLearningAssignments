@@ -144,16 +144,74 @@ class LogisticRegression:
 
 
     def predict_proba(self, X):
-        pass
+        logits = X @ self.weights + self.bias
+           
+        # Apply the softmax function to convert the logits into probabilities.
+        # This returns an array where each row sums to 1, representing the
+        # probability distribution over classes for each sample.
+        return self._softmax(logits)
+
 
     def predict(self, X):
-        pass
+        # Get the predicted probabilities for each class using predict_proba.
+        probabilities = self.predict_proba(X)
+             
+        # For each sample, find the index of the class with the highest probability.
+        # This index corresponds to the predicted class label.
+        predicted_classes_indices = np.argmax(probabilities, axis=1)
+            
+        # Map the indices back to the original class labels if self.classes was set.
+        # If self.classes is None (e.g., for binary classification where y was 0 or 1),
+        # then the indices themselves are the labels.
+        if hasattr(self, 'classes') and self.classes is not None:
+            return self.classes[predicted_classes_indices]
+        else:
+            # This case might happen if y was already one-hot encoded and self.classes wasn't
+            #explicitly set.
+            # For simplicity, if self.classes isn't available, return the index as the label.
+            # In a proper multi-class setup, self.classes should always be populated.
+            return predicted_classes_indices
 
     def score(self, X, y):
-        pass
+        # Ensure y is in the correct format (one-hot encoded) for loss calculation.
+        # This mirrors the y_processed logic from the fit method.
+        n_samples = X.shape[0]
+        if y.ndim == 1:
+            # Assuming y contains integer class labels
+            if not hasattr(self, 'classes') or self.classes is None:
+                raise ValueError("Model not fitted: 'classes' attribute not found. Call fit() first.")
+            
+            n_outputs = len(self.classes)
+            y_one_hot = np.zeros((n_samples, n_outputs))
+            for i, label in enumerate(y):
+                # Ensure the label is one of the known classes.
+                if label in self.classes:
+                    y_one_hot[i, np.where(self.classes == label)[0][0]] = 1
+                else:
+                    # Handle unseen classes in validation if necessary, or raise error.
+                    # For now, let's assume all validation labels are in training classes.
+                    # A more robust solution might ignore these samples or map them to a default.
+                    pass # Or raise an error
+            y_processed = y_one_hot
+        else:
+            y_processed = y
+
+        # Get the predicted probabilities for the given X.
+        probabilities = self.predict_proba(X)
+        
+        # Calculate the Cross-Entropy Loss between true labels (y_processed)
+        # and predicted probabilities.
+        # Add a small epsilon (1e-9) to probabilities to prevent log(0) errors.
+        cross_entropy_loss = -np.mean(np.sum(y_processed * np.log(probabilities + 1e-9), axis=1))
+        
+        # Return the cross-entropy loss. Lower values are better.
+        return cross_entropy_loss
 
     def save(self, file_path):
-        pass
+        np.savez(file_path, weights=self.weights, bias=self.bias)
 
     def load(self, file_path):
-        pass
+        data = np.load(file_path)
+
+        self.weights = data['weights']
+        self.bias = data['bias']
