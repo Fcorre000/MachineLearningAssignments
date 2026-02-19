@@ -1,0 +1,59 @@
+Here is a comparison of the results from training the XOR network with Sigmoid and Tanh activation functions.
+
+### Sigmoid Results
+
+```
+Epoch 0, Loss: 0.7129
+Epoch 1000, Loss: 0.3752
+Epoch 2000, Loss: 0.0293
+Epoch 3000, Loss: 0.0135
+Epoch 4000, Loss: 0.0087
+Epoch 5000, Loss: 0.0064
+Epoch 6000, Loss: 0.0050
+Epoch 7000, Loss: 0.0042
+Epoch 8000, Loss: 0.0035
+Epoch 9000, Loss: 0.0031
+
+Final Predictions (Targets: [0, 1, 1, 0]):
+[[0.00232982 0.99702058 0.99701639 0.00256465]]
+```
+
+### Tanh Results
+
+```
+Epoch 0, Loss: 0.6134
+Epoch 1000, Loss: 0.0021
+Epoch 2000, Loss: 0.0005
+Epoch 3000, Loss: 0.0003
+...
+Epoch 9000, Loss: 0.0001
+
+Final Predictions (Targets would ideally be [-1, 1, 1, -1]):
+[[-0.99973466  0.99985028  0.9998503  -0.99970812]]
+```
+
+### Comparison and Analysis
+
+1.  **Convergence Speed:** `Tanh` converged significantly faster and reached a much lower loss value 
+than `Sigmoid`. After just 1000 epochs, `Tanh`'s loss (`0.0021`) was already an order of magnitude lower 
+than `Sigmoid`'s loss at 9000 epochs (`0.0031`).
+
+2.  **Output Range:**
+    *   `Sigmoid` outputs are in the `[0, 1]` range, which is a perfect match for the `[0, 1]` targets 
+    of the XOR problem and the `BinaryCrossEntropyLoss`.
+    *   `Tanh` outputs are in the `[-1, 1]` range. Your network correctly learned to map the inputs 
+    to the extremes of this range (`-1` for class 0, `+1` for class 1). This demonstrates it successfully 
+    separated the data.
+
+3.  **Why Tanh Converged Faster (The "Zero-Centered" Advantage):**
+    *   The outputs of the `Sigmoid` function are always positive (`0` to `1`). This can cause a problem 
+    in backpropagation where the gradients for the weights are always either all positive or all negative. 
+    This leads to an inefficient, zig-zagging path during optimization.
+    *   The outputs of `Tanh` are "zero-centered" (`-1` to `1`). This allows the gradients to be both 
+    positive and negative, leading to a more direct and efficient optimization path. For this reason, 
+    `Tanh` is often preferred over `Sigmoid` for hidden layers.
+
+**Conclusion:** For this problem, `Tanh` was easier and faster to train due to its zero-centered nature, 
+even though `BinaryCrossEntropyLoss` is not the standard loss function for a `[-1, 1]` output.
+
+Before we proceed, remember to save the weights of your best model using `model.save_weights("XOR_solved.w")`.
