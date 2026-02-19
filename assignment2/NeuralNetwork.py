@@ -73,12 +73,14 @@ class BinaryCrossEntropyLoss:
 
 class Sequential:
     def __init__(self, layers=None):
+        #a list to store our layers in order
         self.layers = layers if layers is not None else []
 
     def add(self, layer):
         self.layers.append(layer)
     
     def forward(self, input_data):
+        #assembly line, pass the output of one layer as the input to the next
         for layer in self.layers:
             input_data = layer.forward(input_data)
         return input_data
@@ -96,11 +98,13 @@ class Sequential:
             if isinstance(layer, Linear):
                 data.append({'w': layer.weights, 'b': layer.bias})
             else:
+                #activation layers don't have weights to save
                 data.append(None)
         with open(filepath, 'wb') as f:
             pickle.dump(data, f)
     
     def load_weights(self, filepath):
+        #read the file and put the weights back into the Linear layers
         with open(filepath, 'rb') as f:
             data = pickle.load(f)
         for i, layer in enumerate(self.layers):
