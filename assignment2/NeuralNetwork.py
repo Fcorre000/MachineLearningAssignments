@@ -111,3 +111,13 @@ class Sequential:
             if data[i] is not None and isinstance(layer, Linear):
                 layer.weights = data[i]['w']
                 layer.bias = data[i]['b']
+
+class Tanh(Layer):
+    def forward(self, input_data):
+        #tanh maps input to a range between -1 and 1
+        self.output = np.tanh(input_data)
+        return self.output
+    
+    def backward(self, output_gradient, learning_rate):
+        #derivative of tanh is 1- output^2
+        return output_gradient * (1 - self.output ** 2)
