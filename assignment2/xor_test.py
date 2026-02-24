@@ -12,9 +12,9 @@ y = np.array([[0,1,1,0]])
 #1. Define the model
 model = Sequential()
 model.add(Linear(2,2)) #input(2) -> Hidden(2)
-model.add(Tanh()) #activation
+model.add(Sigmoid()) #activation
 model.add(Linear(2,1)) #hidden(2) -> output(1)
-model.add(Tanh()) #final activation (for 0-1 probability)
+model.add(Sigmoid()) #final activation (correct for 0-1 probability)
 
 #2. define loss and hyperparameters
 loss_func = BinaryCrossEntropyLoss()
@@ -39,5 +39,9 @@ for i in range(epochs):
 #final test
 print("\nFinal Predictions:")
 print(model.forward(X))
+
+#save the solved weights
+model.save_weights("XOR_solved.w")
+print("\nWeights saved to XOR_solved.w")
 
 
