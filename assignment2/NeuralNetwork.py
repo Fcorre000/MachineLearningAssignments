@@ -121,3 +121,13 @@ class Tanh(Layer):
     def backward(self, output_gradient, learning_rate):
         #derivative of tanh is 1- output^2
         return output_gradient * (1 - self.output ** 2)
+    
+class MSE:
+    def forward(self, y_pred, y_true):
+        #calculate the MSE
+        return np.mean(np.power(y_pred - y_true, 2))
+    
+    def backward(self, y_pred, y_true):
+        #the derivative of MSE if 2 * (y_pred - y_true) / n
+        #this is the starting gradient for backpropagation
+        return 2 * (y_pred - y_true) / y_true.size
